@@ -5,7 +5,7 @@ These are fixtures that every app needs so probably you will not be editing this
 import os
 from py4web import Session, Cache, Translator, DAL, Field
 from py4web.utils.auth import Auth
-from py4web.utils.tags import Tags
+from pydal.tools.tags import Tags
 from py4web.utils.factories import ActionFactory
 from py4web.utils.url_signer import URLSigner
 from . import settings
