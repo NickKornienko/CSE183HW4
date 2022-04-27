@@ -32,7 +32,8 @@ from py4web.utils.form import Form, FormStyleBulma
 from py4web.utils.url_signer import URLSigner
 
 from yatl.helpers import A
-from . common import db, session, T, cache, auth, signed_url
+from .models import get_user_email
+from .common import db, session, T, cache, auth, signed_url
 
 
 url_signer = URLSigner(session)
@@ -41,4 +42,39 @@ url_signer = URLSigner(session)
 @action('index')
 @action.uses('index.html', auth.user)
 def index():
-    return dict()
+    return dict(rows=db(db.address.user_email == get_user_email()).select())
+
+
+@action('add', method=["GET", "POST"])
+@action.uses('add.html', url_signer, db, session, auth.user)
+def add():
+    form = Form(db.address, csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        redirect(URL('index'))
+    return dict(form=form)
+
+
+@action('del/<address_id:int>')
+@action.uses(db, auth.user, session, url_signer)
+def inc(address_id=None):
+    assert address_id is not None
+    db(db.address.id == address_id).delete()
+    redirect(URL('index'))
+
+
+@action('edit_address/<address_id:int>', method=["GET", "POST"])
+@action.uses('edit_address.html', url_signer, db, session, auth.user)
+def edit_address(address_id=None):
+    assert address_id is not None
+
+    p = db.address[address_id]
+    if p is None:
+        redirect(URL('index'))
+    if p.user_email != get_user_email():
+        redirect(URL('index'))
+
+    form = Form(db.address, record=p, deletable=False,
+                csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        redirect(URL('index'))
+    return dict(form=form)
