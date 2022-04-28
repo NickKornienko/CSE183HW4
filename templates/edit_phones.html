@@ -3,7 +3,7 @@
 <div class="section">
 
   <div class="title">
-    Phone numbers for [[=user.name]]
+    Phone numbers for [[=name]]
   </div>
 
   <table class="table is-striped is-fullwidth">
@@ -24,19 +24,18 @@
           <span class="icon"><i class="fa fa-fw fa-trash"></i></span>
         </a>
       </td>
-      <td>[[=row.phone]]</td>
-      <td>
-        <a class="button is-warning" href="[[=URL('edit_phone', row.id)]]">
-          <span class="icon"><i class="fa fa-fw fa-edit"></i></span>
-        </a>
-      </td>
     </tr>
     [[pass]]
   </table>
 
-  <a class="button is-success" href="[[=URL('add')]]">
+  <a class="button is-success" href="[[=URL('index')]]">
+    <span class="icon"><i class="fa fa-arrow-left"></i></span>
+    <span>Back</span>
+  </a>
+
+  <a class="button is-primary" href="[[=URL('add_phone')]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
-    <span>Add Contact</span>
+    <span>Add Phone Number</span>
   </a>
 
 </div>

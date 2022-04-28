@@ -54,9 +54,9 @@ def add():
     return dict(form=form)
 
 
-@action('del/<address_id:int>')
+@action('del_address/<address_id:int>')
 @action.uses(db, auth.user, session, url_signer)
-def inc(address_id=None):
+def del_address(address_id=None):
     assert address_id is not None
     db(db.address.id == address_id).delete()
     redirect(URL('index'))
@@ -78,3 +78,32 @@ def edit_address(address_id=None):
     if form.accepted:
         redirect(URL('index'))
     return dict(form=form)
+
+
+@action('edit_phones')
+@action.uses('edit_phones.html', url_signer, db, session, auth.user)
+def edit_phones():
+    return dict(
+        name=auth.current_user.get('first_name') +
+        " " + auth.current_user.get('last_name'),
+        rows=db(db.phone.user_email == get_user_email()).select()
+    )
+
+
+@action('add_phone', method=["GET", "POST"])
+@action.uses('add_phone.html', url_signer, db, session, auth.user)
+def add_phone():
+    form = Form(db.phone, csrf_session=session, formstyle=FormStyleBulma)
+    if form.accepted:
+        redirect(URL('edit_phones'))
+    return dict(
+        name=auth.current_user.get('first_name') +
+        " " + auth.current_user.get('last_name'),
+        form=form)
+
+@action('del_phone/<phone_id:int>')
+@action.uses(db, auth.user, session, url_signer)
+def del_phone(phone_id=None):
+    assert phone_id is not None
+    db(db.phone.id == phone_id).delete()
+    redirect(URL('edit_phones'))
