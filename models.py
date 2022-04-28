@@ -26,13 +26,13 @@ db.address.phone.readable = db.address.phone.writable = False
 
 db.define_table(
     'phone',
-    Field('user_email', default=get_user_email),
+    Field('address_id'),
     Field('phone_number', requires=IS_NOT_EMPTY()),
     Field('kind', requires=IS_NOT_EMPTY()),
 )
 
 db.phone.id.readable = db.phone.id.writable = False
-db.phone.user_email.readable = db.phone.user_email.writable = False
+db.phone.address_id.readable = db.phone.address_id.writable = False
 
 
 db.commit()

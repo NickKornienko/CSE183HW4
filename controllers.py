@@ -73,37 +73,62 @@ def edit_address(address_id=None):
     if p.user_email != get_user_email():
         redirect(URL('index'))
 
-    form = Form(db.address, record=p, deletable=False,
+    form = Form(db.address, deletable=False,
                 csrf_session=session, formstyle=FormStyleBulma)
     if form.accepted:
         redirect(URL('index'))
     return dict(form=form)
 
 
-@action('edit_phones')
+@action('edit_phones/<address_id:int>')
 @action.uses('edit_phones.html', url_signer, db, session, auth.user)
-def edit_phones():
+def edit_phones(address_id=None):
+    assert address_id is not None
+
     return dict(
-        name=auth.current_user.get('first_name') +
-        " " + auth.current_user.get('last_name'),
-        rows=db(db.phone.user_email == get_user_email()).select()
+        entry=db(db.address.id == address_id).select(),
+        address_id=address_id,
+        rows=db(db.phone.address_id == address_id).select()
     )
 
 
-@action('add_phone', method=["GET", "POST"])
+@action('add_phone/<address_id:int>', method=["GET", "POST"])
 @action.uses('add_phone.html', url_signer, db, session, auth.user)
-def add_phone():
-    form = Form(db.phone, csrf_session=session, formstyle=FormStyleBulma)
+def add_phone(address_id=None):
+    assert address_id is not None
+    form = Form([Field('phone'), Field('kind')], csrf_session=session,
+                formstyle=FormStyleBulma)
+
     if form.accepted:
-        redirect(URL('edit_phones'))
+        db.phone.insert(address_id=address_id,
+                        phone_number=form.vars['phone'], kind=form.vars['kind'])
+        redirect(URL('edit_phones/' + str(address_id)))
+
     return dict(
-        name=auth.current_user.get('first_name') +
-        " " + auth.current_user.get('last_name'),
+        entry=db(db.address.id == address_id).select(),
         form=form)
 
-@action('del_phone/<phone_id:int>')
+
+@action('del_phone/<address_id:int>/<phone_id:int>')
 @action.uses(db, auth.user, session, url_signer)
-def del_phone(phone_id=None):
+def del_phone(phone_id=None, address_id=None):
     assert phone_id is not None
+    assert address_id is not None
     db(db.phone.id == phone_id).delete()
-    redirect(URL('edit_phones'))
+    redirect(URL('edit_phones/' + str(address_id)))
+
+
+@action('edit_phone/<address_id:int>/<phone_id:int>')
+@action.uses('edit_phone.html', db, auth.user, session, url_signer)
+def edit_phone(phone_id=None, address_id=None):
+    assert phone_id is not None
+    assert address_id is not None
+
+    form = Form(db.phone, deletable=False,
+                csrf_session=session, formstyle=FormStyleBulma)
+
+    if form.accepted:
+        redirect(URL('edit_phones/' + str(address_id)))
+
+    return dict(form=form,
+                entry=db(db.address.id == address_id).select())

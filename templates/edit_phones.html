@@ -3,7 +3,10 @@
 <div class="section">
 
   <div class="title">
-    Phone numbers for [[=name]]
+
+    [[for e in entry:]]
+    [[=e.first]] [[=e.last]]
+    [[pass]]
   </div>
 
   <table class="table is-striped is-fullwidth">
@@ -17,10 +20,10 @@
       <td>[[=row.phone_number]]</td>
       <td>[[=row.kind]]</td>
       <td>
-        <a class="button is-warning" href="[[=URL('edit_phone', row.id)]]">
+        <a class="button is-warning" href="[[=URL('edit_phone', address_id, row.id)]]">
           <span class="icon"><i class="fa fa-fw fa-edit"></i></span>
         </a>
-        <a class="button is-danger" href="[[=URL('del_phone', row.id)]]">
+        <a class="button is-danger" href="[[=URL('del_phone', address_id, row.id)]]">
           <span class="icon"><i class="fa fa-fw fa-trash"></i></span>
         </a>
       </td>
@@ -33,7 +36,7 @@
     <span>Back</span>
   </a>
 
-  <a class="button is-primary" href="[[=URL('add_phone')]]">
+  <a class="button is-primary" href="[[=URL('add_phone', address_id)]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
     <span>Add Phone Number</span>
   </a>
