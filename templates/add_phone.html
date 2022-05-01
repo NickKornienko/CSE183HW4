@@ -1,10 +1,7 @@
 [[extend 'layout.html']]
 
 <div class="section">
+    <h1 class="title">Phone number for [[for e in entry:]] [[=e.first]] [[=e.last]][[pass]]</h1>
 
-    <div class="section">
-
-        <h1 class="title">Phone number for [[for e in entry:]] [[=e.first]] [[=e.last]][[pass]]</h1>
-
-        [[=form]]
-    </div>
+    [[=form]]
+</div>

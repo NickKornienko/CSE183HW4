@@ -42,7 +42,21 @@ url_signer = URLSigner(session)
 @action('index')
 @action.uses('index.html', auth.user)
 def index():
-    return dict(rows=db(db.address.user_email == get_user_email()).select())
+    rows = db(db.address.user_email == get_user_email()).select()
+
+    for row in rows:
+        phone_str = ""
+        phone_numbers = db(db.phone.address_id == row.id).select()
+        for phone_number in phone_numbers:
+            number = phone_number.phone_number
+            kind = phone_number.kind
+            if phone_str != "":
+                phone_str += ", "
+            phone_str += f"{number} ({kind})"
+
+        db(db.address.id == row.id).update(phone=phone_str)
+
+    return dict(rows=rows)
 
 
 @action('add', method=["GET", "POST"])
@@ -63,7 +77,7 @@ def del_address(address_id=None):
 
 
 @action('edit_address/<address_id:int>', method=["GET", "POST"])
-@action.uses('edit_address.html', url_signer, db, session, auth.user)
+@action.uses('add.html', url_signer, db, session, auth.user)
 def edit_address(address_id=None):
     assert address_id is not None
 
@@ -73,7 +87,7 @@ def edit_address(address_id=None):
     if p.user_email != get_user_email():
         redirect(URL('index'))
 
-    form = Form(db.address, deletable=False,
+    form = Form(db.address, record=p, deletable=False,
                 csrf_session=session, formstyle=FormStyleBulma)
     if form.accepted:
         redirect(URL('index'))
@@ -118,13 +132,17 @@ def del_phone(phone_id=None, address_id=None):
     redirect(URL('edit_phones/' + str(address_id)))
 
 
-@action('edit_phone/<address_id:int>/<phone_id:int>')
-@action.uses('edit_phone.html', db, auth.user, session, url_signer)
+@action('edit_phone/<address_id:int>/<phone_id:int>', method=["GET", "POST"])
+@action.uses('add_phone.html', db, auth.user, session, url_signer)
 def edit_phone(phone_id=None, address_id=None):
     assert phone_id is not None
     assert address_id is not None
 
-    form = Form(db.phone, deletable=False,
+    p = db.phone[phone_id]
+    if p is None:
+        redirect(URL('edit_phone/<address_id:int>/<phone_id:int>'))
+
+    form = Form(db.phone, record=p, deletable=False,
                 csrf_session=session, formstyle=FormStyleBulma)
 
     if form.accepted:
