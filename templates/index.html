@@ -19,16 +19,16 @@
       <td>[[=row.first]]</td>
       <td>[[=row.last]]</td>
       <td>
-        <a class="button is-warning" href="[[=URL('edit_address', row.id)]]">
+        <a class="button is-warning" href="[[=URL('edit_address', row.id, signer=url_signer)]]">
           <span class="icon"><i class="fa fa-fw fa-edit"></i></span>
         </a>
-        <a class="button is-danger" href="[[=URL('del_address', row.id)]]">
+        <a class="button is-danger" href="[[=URL('del_address', row.id, signer=url_signer)]]">
           <span class="icon"><i class="fa fa-fw fa-trash"></i></span>
         </a>
       </td>
       <td>[[=row.phone]]</td>
       <td>
-        <a class="button is-warning" href="[[=URL('edit_phones', row.id)]]">
+        <a class="button is-warning" href="[[=URL('edit_phones', row.id, signer=url_signer)]]">
           <span class="icon"><i class="fa fa-fw fa-edit"></i></span>
         </a>
       </td>
@@ -36,7 +36,7 @@
     [[pass]]
   </table>
 
-  <a class="button is-success" href="[[=URL('add')]]">
+  <a class="button is-success" href="[[=URL('add', signer=url_signer)]]">
     <span class="icon"><i class="fa fa-plus"></i></span>
     <span>Add Contact</span>
   </a>

@@ -40,7 +40,7 @@ url_signer = URLSigner(session)
 
 # The auth.user below forces login.
 @action('index')
-@action.uses('index.html', auth.user)
+@action.uses('index.html', auth.user, url_signer)
 def index():
     rows = db(db.address.user_email == get_user_email()).select()
 
@@ -56,11 +56,11 @@ def index():
 
         db(db.address.id == row.id).update(phone=phone_str)
 
-    return dict(rows=rows)
+    return dict(rows=rows, url_signer=url_signer)
 
 
 @action('add', method=["GET", "POST"])
-@action.uses('add.html', url_signer, db, session, auth.user)
+@action.uses('add.html', url_signer.verify(), db, session, auth.user)
 def add():
     form = Form(db.address, csrf_session=session, formstyle=FormStyleBulma)
     if form.accepted:
@@ -69,7 +69,7 @@ def add():
 
 
 @action('del_address/<address_id:int>')
-@action.uses(db, auth.user, session, url_signer)
+@action.uses(db, auth.user, session, url_signer.verify())
 def del_address(address_id=None):
     assert address_id is not None
     db(db.address.id == address_id).delete()
@@ -77,7 +77,7 @@ def del_address(address_id=None):
 
 
 @action('edit_address/<address_id:int>', method=["GET", "POST"])
-@action.uses('add.html', url_signer, db, session, auth.user)
+@action.uses('add.html', url_signer.verify(), db, session, auth.user)
 def edit_address(address_id=None):
     assert address_id is not None
 
@@ -102,12 +102,13 @@ def edit_phones(address_id=None):
     return dict(
         entry=db(db.address.id == address_id).select(),
         address_id=address_id,
-        rows=db(db.phone.address_id == address_id).select()
+        rows=db(db.phone.address_id == address_id).select(),
+        url_signer=url_signer
     )
 
 
 @action('add_phone/<address_id:int>', method=["GET", "POST"])
-@action.uses('add_phone.html', url_signer, db, session, auth.user)
+@action.uses('add_phone.html', url_signer.verify(), db, session, auth.user)
 def add_phone(address_id=None):
     assert address_id is not None
     form = Form([Field('phone'), Field('kind')], csrf_session=session,
@@ -124,7 +125,7 @@ def add_phone(address_id=None):
 
 
 @action('del_phone/<address_id:int>/<phone_id:int>')
-@action.uses(db, auth.user, session, url_signer)
+@action.uses(db, auth.user, session, url_signer.verify())
 def del_phone(phone_id=None, address_id=None):
     assert phone_id is not None
     assert address_id is not None
@@ -133,7 +134,7 @@ def del_phone(phone_id=None, address_id=None):
 
 
 @action('edit_phone/<address_id:int>/<phone_id:int>', method=["GET", "POST"])
-@action.uses('add_phone.html', db, auth.user, session, url_signer)
+@action.uses('add_phone.html', db, auth.user, session, url_signer.verify())
 def edit_phone(phone_id=None, address_id=None):
     assert phone_id is not None
     assert address_id is not None
